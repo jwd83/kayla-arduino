@@ -1,10 +1,10 @@
 #define BITRATE 38400
-#define channels 6
+#define CHANNELS 6
 #define MODE_RAW 0
 #define MODE_VOLTAGE 1
 #define PIN_PWM_DAC 5
 
-int samples[channels];
+int samples[CHANNELS];
 bool stream = false;
 bool sample_analogs = false;
 bool generate_sine_wave = true;
@@ -19,14 +19,14 @@ void setup() {
   Serial.begin(BITRATE);
 
   // start all analog sample values at 0
-  for (int i = 0; i < channels; i++) {
+  for (int i = 0; i < CHANNELS; i++) {
     samples[i] = 0;
   }
 }
 
 void send_all_channels() {
 
-  for (int i = 0; i < channels; i++) {
+  for (int i = 0; i < CHANNELS; i++) {
     if (i > 0) Serial.print(",");
     send_channel(i);
   }
@@ -48,7 +48,16 @@ void update_duty_cycle() {
 
   if (generate_sine_wave) {
     unsigned long current_millis = millis();
-    duty_cycle = (uint8_t)next_sine_value(122.5, 0.25, current_millis, 127.5, 0.0);
+
+    //
+    // auto amplitude = 122.5;
+    auto amplitude = 40;
+    // auto frequency = 0.25;
+    auto frequency = 0.5;
+    // auto frequency = 1;
+
+
+    duty_cycle = (uint8_t)next_sine_value(amplitude, frequency, current_millis, 127.5, 0.0);
     // Serial.print(duty_cycle);
     // Serial.println(",0,255");
     if (duty_cycle_written != duty_cycle) {
@@ -69,7 +78,7 @@ void update_duty_cycle() {
 void update_analogs() {
   // sample analog to digital converters
   if (sample_analogs) {
-    for (int i = 0; i < channels; i++) {
+    for (int i = 0; i < CHANNELS; i++) {
       samples[i] = analogRead(i);
     }
   }
